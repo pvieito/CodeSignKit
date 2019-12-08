@@ -1,0 +1,25 @@
+# Hidden Files
+.*
+!.gitignore
+!.gitkeep
+
+# Swift
+build/
+Package.resolved
+
+# Python
+*.pyc
+
+# Temporary Items
+*.tmp
+*.tmp.*
+
+# Virtual Environments
+/venv*/
+
+# Configuration Override
+*.override.*
+
+# Extra Directories
+/Assets
+/Extra
