@@ -11,6 +11,7 @@ import FoundationKit
 import LoggerKit
 import CommandLineKit
 import CodeSignKit
+import Security
 
 let inputOption = StringOption(shortFlag: "i", longFlag: "input", helpMessage: "Input item.")
 let simulatorOption = BoolOption(longFlag: "sim", helpMessage: "Read simulator entitlements.")

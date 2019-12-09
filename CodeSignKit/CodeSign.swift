@@ -16,14 +16,14 @@ public enum CodeSign {
     }
     
     public static func sign(
-        at url: URL, identity: String? = nil, entitlements: URL? = nil, force: Bool = false) throws {
+        at url: URL, identity: String? = nil, entitlementsURL: URL? = nil, force: Bool = false) throws {
         var arguments: [String] = []
         
         let identity = identity ?? Self.defaultIdentity ?? Self.defaultBaseIdentity
         arguments += ["-s", identity]
-
-        if let entitlements = entitlements {
-            arguments += ["--entitlements", entitlements.path]
+        
+        if let entitlementsURL = entitlementsURL {
+            arguments += ["--entitlements", entitlementsURL.path]
         }
         
         if force {
@@ -35,8 +35,18 @@ public enum CodeSign {
         let process = try Process(
             executableName: "codesign",
             arguments: arguments)
-        process.standardError = FileHandle.nullDevice
-        try process.runAndWaitUntilExit()
+        
+        let standardErrorPipe = Pipe()
+        process.standardError = standardErrorPipe.fileHandleForWriting
+        
+        do {
+            try process.runAndWaitUntilExit()
+        }
+        catch {
+            standardErrorPipe.fileHandleForWriting.closeFile()
+            FileHandle.standardError.write(standardErrorPipe.fileHandleForReading.readDataToEndOfFile())
+            throw error
+        }
     }
 }
 
@@ -51,16 +61,17 @@ extension CodeSign {
     
     private static func signMainExecutableAndRun(file: String = #file) throws {
         let targetDirectory = file.pathURL.deletingLastPathComponent()
-        let entitlements = targetDirectory
+        let targetEntitlementsURL = targetDirectory
             .appendingPathComponent(targetDirectory.lastPathComponent)
             .appendingPathExtension("entitlements")
+        let entitlementsURL = FileManager.default.fileExists(at: targetEntitlementsURL) ? targetEntitlementsURL: nil
         
         var environment = ProcessInfo.processInfo.environment
         environment[executableSignedEnvironmentKey] = "TRUE"
-
+        
         try Self.sign(
             at: Bundle.main.executableURL!,
-            entitlements: entitlements,
+            entitlementsURL: entitlementsURL,
             force: true)
         let process = Process()
         process.executableURL = Bundle.main.executableURL!
