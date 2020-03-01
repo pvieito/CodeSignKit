@@ -75,7 +75,7 @@ extension CodeSign {
             force: true)
         let process = Process()
         process.executableURL = Bundle.main.executableURL!
-        process.arguments = CommandLine.arguments
+        process.arguments = Array<String>(CommandLine.arguments.dropFirst())
         process.environment = environment
         try process.runReplacingCurrentProcess()
     }
