@@ -11,7 +11,6 @@ import FoundationKit
 import LoggerKit
 import ArgumentParser
 import CodeSignKit
-import Security
 
 struct CodeSignTool: ParsableCommand {
     static var configuration: CommandConfiguration {
