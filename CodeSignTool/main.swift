@@ -9,32 +9,29 @@
 import Foundation
 import FoundationKit
 import LoggerKit
-import CommandLineKit
+import ArgumentParser
 import CodeSignKit
 import Security
 
-let inputOption = StringOption(shortFlag: "i", longFlag: "input", helpMessage: "Input item.")
-let simulatorOption = BoolOption(longFlag: "sim", helpMessage: "Read simulator entitlements.")
-let verboseOption = BoolOption(shortFlag: "v", longFlag: "verbose", helpMessage: "Verbose mode.")
-let helpOption = BoolOption(shortFlag: "h", longFlag: "help", helpMessage: "Prints a help message.")
+struct CodeSignTool: ParsableCommand {
+    static var configuration: CommandConfiguration {
+        return CommandConfiguration(commandName: String(describing: Self.self))
+    }
 
-let cli = CommandLineKit.CommandLine()
-cli.addOptions(inputOption, simulatorOption, verboseOption, helpOption)
+    @Flag(name: .shortAndLong, help: "Verbose mode.")
+    var verbose: Bool
 
-do {
-    try cli.parse(strict: true)
+    func run() throws {
+        do {
+            Logger.logMode = .commandLine
+            Logger.logLevel = self.verbose ? .debug : .info
+
+            try CodeSign.signMainExecutableOnceAndRun()
+        }
+        catch {
+            Logger.log(fatalError: error)
+        }
+    }
 }
-catch {
-    cli.printUsage(error)
-    exit(EX_USAGE)
-}
 
-if helpOption.value {
-    cli.printUsage()
-    exit(0)
-}
-
-Logger.logMode = .commandLine
-Logger.logLevel = verboseOption.value ? .debug : .info
-
-try CodeSign.signMainExecutableOnceAndRun()
+CodeSignTool.main()

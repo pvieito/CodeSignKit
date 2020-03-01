@@ -20,12 +20,12 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/pvieito/FoundationKit.git", .branch("master")),
         .package(url: "https://github.com/pvieito/LoggerKit.git", .branch("master")),
-        .package(url: "https://github.com/pvieito/CommandLineKit.git", .branch("master"))
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "0.0.1"),
     ],
     targets: [
         .target(
             name: "CodeSignTool",
-            dependencies: ["CodeSignKit", "LoggerKit", "FoundationKit", "CommandLineKit"],
+            dependencies: ["CodeSignKit", "LoggerKit", "FoundationKit", .product(name: "ArgumentParser", package: "swift-argument-parser")],
             path: "CodeSignTool"
         ),
         .target(
