@@ -16,6 +16,15 @@ struct CodeSignTool: ParsableCommand {
     static var configuration: CommandConfiguration {
         return CommandConfiguration(commandName: String(describing: Self.self))
     }
+    
+    @Option(name: .shortAndLong, help: "Input executable.")
+    var input: String?
+
+    @Option(name: .shortAndLong, help: "Signature entitlements.")
+    var entitlements: String?
+
+    @Flag(name: .shortAndLong, inversion: .prefixedNo, help: "Force signature.")
+    var force: Bool
 
     @Flag(name: .shortAndLong, help: "Verbose mode.")
     var verbose: Bool
@@ -25,7 +34,14 @@ struct CodeSignTool: ParsableCommand {
             Logger.logMode = .commandLine
             Logger.logLevel = self.verbose ? .debug : .info
 
-            try CodeSign.signMainExecutableOnceAndRun()
+            let entitlementsURL = self.entitlements?.pathURL
+            if let executableURL = input?.pathURL {
+                try CodeSign.sign(at: executableURL, entitlementsURL: entitlementsURL, force: self.force)
+            }
+            else {
+                try CodeSign.signMainExecutableOnceAndRun(entitlementsURL: entitlementsURL)
+                Logger.log(success: "Running as self-signed executable…")
+            }
         }
         catch {
             Logger.log(fatalError: error)

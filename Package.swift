@@ -30,7 +30,7 @@ let package = Package(
         ),
         .target(
             name: "CodeSignKit",
-            dependencies: ["FoundationKit"],
+            dependencies: ["FoundationKit", "LoggerKit"],
             path: "CodeSignKit"
         )
     ]

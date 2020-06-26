@@ -8,6 +8,7 @@
 
 import Foundation
 import FoundationKit
+import LoggerKit
 
 public enum CodeSign {
     private static let defaultBaseIdentity = "Apple Developement"
@@ -17,6 +18,8 @@ public enum CodeSign {
     
     public static func sign(
         at url: URL, identity: String? = nil, entitlementsURL: URL? = nil, force: Bool = false) throws {
+        Logger.log(debug: "Signing executable at “\(url.path)” with entitlements “\(entitlementsURL?.path ?? "default")” (force: \(force))…")
+        
         var arguments: [String] = []
         
         let identity = identity ?? Self.defaultIdentity ?? Self.defaultBaseIdentity
@@ -59,20 +62,22 @@ extension CodeSign {
         return ProcessInfo.processInfo.environment[Self.executableSignedEnvironmentKey] != nil
     }
     
-    private static func signMainExecutableAndRun(file: String = #file) throws {
+    private static func signMainExecutableAndRun(
+        file: String = #file, entitlementsURL: URL? = nil) throws {
         let targetDirectory = file.pathURL.deletingLastPathComponent()
         let targetEntitlementsURL = targetDirectory
             .appendingPathComponent(targetDirectory.lastPathComponent)
             .appendingPathExtension("entitlements")
-        let entitlementsURL = FileManager.default.fileExists(at: targetEntitlementsURL) ? targetEntitlementsURL: nil
-        
-        var environment = ProcessInfo.processInfo.environment
-        environment[executableSignedEnvironmentKey] = "TRUE"
-        
+        let defaultEntitlementsURL = FileManager.default.fileExists(at: targetEntitlementsURL) ? targetEntitlementsURL: nil
+        let entitlementsURL = entitlementsURL ?? defaultEntitlementsURL
+
         try Self.sign(
             at: Bundle.main.executableURL!,
             entitlementsURL: entitlementsURL,
             force: true)
+        
+        var environment = ProcessInfo.processInfo.environment
+        environment[executableSignedEnvironmentKey] = "TRUE"
         let process = Process()
         process.executableURL = Bundle.main.executableURL!
         process.arguments = Array<String>(CommandLine.arguments.dropFirst())
@@ -80,11 +85,12 @@ extension CodeSign {
         try process.runReplacingCurrentProcess()
     }
     
-    public static func signMainExecutableOnceAndRun(file: String = #file) throws {
+    public static func signMainExecutableOnceAndRun(
+        file: String = #file, entitlementsURL: URL? = nil) throws {
         guard !Self.isExecutableSigned else {
             return
         }
         
-        try Self.signMainExecutableAndRun(file: file)
+        try Self.signMainExecutableAndRun(file: file, entitlementsURL: entitlementsURL)
     }
 }
