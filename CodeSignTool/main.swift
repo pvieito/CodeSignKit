@@ -24,10 +24,10 @@ struct CodeSignTool: ParsableCommand {
     var entitlements: String?
 
     @Flag(name: .shortAndLong, inversion: .prefixedNo, help: "Force signature.")
-    var force: Bool
+    var force: Bool = false
 
     @Flag(name: .shortAndLong, help: "Verbose mode.")
-    var verbose: Bool
+    var verbose: Bool = false
 
     func run() throws {
         do {
