@@ -62,9 +62,8 @@ extension CodeSign {
         return ProcessInfo.processInfo.environment[Self.executableSignedEnvironmentKey] != nil
     }
     
-    private static func signMainExecutableAndRun(
-        file: String = #file, entitlementsURL: URL? = nil) throws {
-        let targetDirectory = file.pathURL.deletingLastPathComponent()
+    private static func signMainExecutableAndRun(entitlementsURL: URL? = nil, _file: String = #filePath) throws {
+        let targetDirectory = _file.pathURL.deletingLastPathComponent()
         let targetEntitlementsURL = targetDirectory
             .appendingPathComponent(targetDirectory.lastPathComponent)
             .appendingPathExtension("entitlements")
@@ -85,12 +84,11 @@ extension CodeSign {
         try process.runReplacingCurrentProcess()
     }
     
-    public static func signMainExecutableOnceAndRun(
-        file: String = #file, entitlementsURL: URL? = nil) throws {
+    public static func signMainExecutableOnceAndRun(entitlementsURL: URL? = nil, _file: String = #filePath) throws {
         guard !Self.isExecutableSigned else {
             return
         }
         
-        try Self.signMainExecutableAndRun(file: file, entitlementsURL: entitlementsURL)
+        try Self.signMainExecutableAndRun(entitlementsURL: entitlementsURL, _file: _file)
     }
 }
