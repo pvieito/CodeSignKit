@@ -16,8 +16,7 @@ public enum CodeSign {
         return ProcessInfo.processInfo.environment["CODESIGNKIT_DEFAULT_IDENTITY"]
     }
     
-    public static func sign(
-        at url: URL, identity: String? = nil, entitlementsURL: URL? = nil, force: Bool = false) throws {
+    public static func sign(at url: URL, identity: String? = nil, entitlementsURL: URL? = nil, force: Bool = false) throws {
         Logger.log(debug: "Signing executable at “\(url.path)” with entitlements “\(entitlementsURL?.path ?? "default")” (force: \(force))…")
         
         var arguments: [String] = []
@@ -62,8 +61,8 @@ extension CodeSign {
         return ProcessInfo.processInfo.environment[Self.executableSignedEnvironmentKey] != nil
     }
     
-    private static func signMainExecutableAndRun(entitlementsURL: URL? = nil, _file: String = #filePath) throws {
-        let targetDirectory = _file.pathURL.deletingLastPathComponent()
+    private static func signMainExecutableAndRun(entitlementsURL: URL? = nil, _filePath: String = #filePath) throws {
+        let targetDirectory = _filePath.pathURL.deletingLastPathComponent()
         let targetEntitlementsURL = targetDirectory
             .appendingPathComponent(targetDirectory.lastPathComponent)
             .appendingPathExtension("entitlements")
@@ -84,11 +83,11 @@ extension CodeSign {
         try process.runReplacingCurrentProcess()
     }
     
-    public static func signMainExecutableOnceAndRun(entitlementsURL: URL? = nil, _file: String = #filePath) throws {
+    public static func signMainExecutableOnceAndRun(entitlementsURL: URL? = nil, _filePath: String = #filePath) throws {
         guard !Self.isExecutableSigned else {
             return
         }
         
-        try Self.signMainExecutableAndRun(entitlementsURL: entitlementsURL, _file: _file)
+        try Self.signMainExecutableAndRun(entitlementsURL: entitlementsURL, _filePath: _filePath)
     }
 }
