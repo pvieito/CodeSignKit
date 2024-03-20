@@ -12,6 +12,7 @@ import LoggerKit
 import ArgumentParser
 import CodeSignKit
 
+@main
 struct CodeSignTool: ParsableCommand {
     static var configuration: CommandConfiguration {
         return CommandConfiguration(commandName: String(describing: Self.self))
@@ -48,5 +49,3 @@ struct CodeSignTool: ParsableCommand {
         }
     }
 }
-
-CodeSignTool.main()
