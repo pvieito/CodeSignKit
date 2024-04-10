@@ -11,7 +11,7 @@ import FoundationKit
 import LoggerKit
 
 public enum CodeSign {
-    private static let defaultBaseIdentity = "Apple Developement"
+    private static let defaultBaseIdentity = "Apple Development"
     private static var defaultIdentity: String? {
         return ProcessInfo.processInfo.environment["CODESIGNKIT_DEFAULT_IDENTITY"]
     }
